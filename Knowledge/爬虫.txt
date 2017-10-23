@@ -12,3 +12,29 @@
     python中的正则表达式，模糊匹配
     html.parser，BeautifulSoup，lxml，结构化解析—DOM树
 5.getcode() 200页面请求的状态值，分别有：200请求成功、303重定向、400请求错误、401未授权、403禁止访问、404文件未找到、500服务器错误
+6.多线程操作（thread,threading）：
+    可以使用两种方式创建线程对象：
+        （1）通过传递一个接口，通常是一个函数给其构造函数，然后在该函数中处理线程操作。
+        （2）另外一种是定义一个子类继承Thread，然后重写其run函数，子类除了run函数和构造函数可以重写外，其余的都不允许重写。
+    threading.Thread(group=None,target=None,name=None,args=(),kwars={})
+        group   该值使用其默认值为None
+        target  要调用run函数的回调对象，也就是传递一个函数名过去（如果是第一种），也可以直接传入函数
+        name    线程名字，默认就行
+        args    表示传入target函数的参数，一定要是元组
+        kwars   字典参数
+7.scrapy架构框架：
+    （1）scheduler主要用来接收来自引擎的requests请求，然后将其入队，等到需要的时候在将队列中的Requests对象传递给引擎，这就类似于我们自己写的爬虫架构的url管理器的部分角色。只不过我们的那个架构较为简单，只是把url放到集合中，而此处是把Request对象放到队列中
+    （2）downloader负责抓取网页，然后将抓取到的结果Response对象传递给引擎，然后引擎将其传递给spider处理，这和我们自己写的爬虫架构中的网页下载器功能类似
+    （3）spider 该组件是用户自定义的类，通常继承于scrapy.Spider。用来解析Response对象，然后从中提取出item（scrapy中的组件，实质上是用来保存数据），这和我们自定义组件中的spider_main功能类似
+    （4）item pipelines：用来处理spider组件获取的items，如去重，持久化等，主要用来保存数据。这个和我们前面自定义架构中提到的output_data模块类似。
+8.scrapy框架工作原理：
+    （1）引擎从spider组件中获取一个初始Request请求
+    （2）引擎调度Request将其入队到Scheduler组件中，同时获取下一个待爬取的请求
+    （3）Scheduler组件返回下一个带爬取的Request请求给引擎
+    （4）引擎将获取到的Request请求传递给downloader组件
+    （5）downloader组件获取到请求之后会下载该页面，下载完成之后会生成一个Response对象，然后将其返回给引擎
+    （6）引擎从downloader组件中接收返回的Response对象，然后将其传递给Spider组件处理
+    （7）Spider组件处理接收到的Response对象，从中解析出item和新的Request请求，然后将其返回给引擎
+    （8）引擎将Spider组件解析的item传递给item pipelines组件，同时将解析的Request请求传递给Scheduler组件入队，然后从Scheduler组件中获取下一个待爬取的Request请求。
+    （9）重复上述过程，直至Scheduler组件中无Request请求为止
+    
